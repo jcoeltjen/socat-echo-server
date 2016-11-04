@@ -19,7 +19,7 @@ fi
 
 let DELTA=$2-$1+1
 if [ "$DELTA" -gt 10000  ]; then
-  echo "[ERROR] Port bound delta must not exceed 5000"
+  echo "[ERROR] Port bound delta must not exceed 10000"
   exit -1
 fi
 
