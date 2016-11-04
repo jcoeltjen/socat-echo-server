@@ -1,0 +1,50 @@
+#!/bin/bash
+
+if [ "$1" == "" ]
+  then
+    echo "[ERROR] Lower port bound parameter missing"
+    exit -1
+fi
+
+if [ "$2" == "" ]
+  then
+   echo "[ERROR] Upper port bound parameter missing!"
+   exit -1
+fi
+
+if [ "$2" -lt "$1" ]; then
+  echo "[ERROR] Upport port bound must be larger than lower port bound"
+  exit -1
+fi
+
+let DELTA=$2-$1+1
+if [ "$DELTA" -gt 10000  ]; then
+  echo "[ERROR] Port bound delta must not exceed 5000"
+  exit -1
+fi
+
+if [ "$1" -lt 1 ]; then
+  echo "[ERROR] Lower port bound must not be below 1"
+  exit -1
+fi
+
+if [ "$2" -gt 65535 ]; then
+  echo "[ERROR] Upport port bound must not be larger than 65535"
+  exit -1
+fi
+
+echo "Lower Port Bound: $1"
+echo "Upper Port Bound: $2"
+echo
+
+COUNTER=$1
+while [ "$COUNTER" -le $2 ]; do
+  (socat -v tcp-l:$COUNTER,fork exec:'/bin/cat') &
+  let COUNTER=COUNTER+1
+done
+
+#TODO more verbose output
+echo "All socat instances started."
+echo "Instance count (expected): $DELTA"
+let ACTUAL_COUNT=$(ps aux | grep "socat -v" | wc -l)-1
+echo "Instance count (actual):   $ACTUAL_COUNT"
